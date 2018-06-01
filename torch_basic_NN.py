@@ -1,4 +1,5 @@
 import torch
+import visdom
 import matplotlib.pyplot as plt
 
 N, D_in, H, D_out = 64, 1000, 100, 10
@@ -75,4 +76,12 @@ def selfBuild_NN():
 
 
 if __name__ == '__main__':
-    selfBuild_NN()
+    # selfBuild_NN()
+    vis = visdom.Visdom(env=u'test1')
+
+    x = torch.arange(1, 30, 0.01)
+    y = torch.sin(x)
+    vis.line(X=x, Y=y, win='sinx', opts={'title': 'y=sin(x)'})
+
+
+
