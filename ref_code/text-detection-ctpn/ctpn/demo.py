@@ -22,7 +22,7 @@ def resize_im(im, scale, max_scale=None):
 
 def draw_boxes(img,image_name,boxes,scale):
     base_name = image_name.split('/')[-1]
-    with open('data/results/' + 'res_{}.txt'.format(base_name.split('.')[0]), 'w') as f:
+    with open('../data/results/' + 'res_{}.txt'.format(base_name.split('.')[0]), 'w') as f:
         for box in boxes:
             if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3] - box[0]) < 5:
                 continue
@@ -44,7 +44,7 @@ def draw_boxes(img,image_name,boxes,scale):
             f.write(line)
 
     img=cv2.resize(img, None, None, fx=1.0/scale, fy=1.0/scale, interpolation=cv2.INTER_LINEAR)
-    cv2.imwrite(os.path.join("data/results", base_name), img)
+    cv2.imwrite(os.path.join("../data/results", base_name), img)
 
 def ctpn(sess, net, image_name):
     timer = Timer()
@@ -64,11 +64,11 @@ def ctpn(sess, net, image_name):
 
 
 if __name__ == '__main__':
-    if os.path.exists("data/results/"):
-        shutil.rmtree("data/results/")
-    os.makedirs("data/results/")
+    if os.path.exists("../data/results/"):
+        shutil.rmtree("../data/results/")
+    os.makedirs("../data/results/")
 
-    cfg_from_file('ctpn/text.yml')
+    cfg_from_file('text.yml')
 
     # init session
     config = tf.ConfigProto(allow_soft_placement=True)
@@ -91,8 +91,10 @@ if __name__ == '__main__':
     for i in range(2):
         _, _ = test_ctpn(sess, net, im)
 
-    im_names = glob.glob(os.path.join(cfg.DATA_DIR, 'demo', '*.png')) + \
-               glob.glob(os.path.join(cfg.DATA_DIR, 'demo', '*.jpg'))
+    # test sample name
+    test_sample_loc = 'test_small'
+    im_names = glob.glob(os.path.join(cfg.DATA_DIR, 'test_small', '*.png')) + \
+               glob.glob(os.path.join(cfg.DATA_DIR, 'test_small', '*.jpg'))
 
     for im_name in im_names:
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
