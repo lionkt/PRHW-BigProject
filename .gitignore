@@ -1,1 +1,22 @@
 .idea/*
+__pycache__/
+
+# text-detection-ctpn目录下的文件
+./ref_code/text-detection-ctpn/__pycache__/
+./ref_code/text-detection-ctpn/cache/
+./ref_code/text-detection-ctpn/pretrain/
+./ref_code/text-detection-ctpn/VOCdevkit2007/
+./ref_code/text-detection-ctpn/logs/
+./ref_code/text-detection-ctpn/output/
+./ref_code/text-detection-ctpn/build/
+./ref_code/text-detection-ctpn/dist/
+./ref_code/text-detection-ctpn/.idea/
+./ref_code/text-detection-ctpn/*.py[cod]
+./ref_code/text-detection-ctpn/*.c[cod]
+./ref_code/text-detection-ctpn/*.so
+./ref_code/text-detection-ctpn/*.swp
+ref_code/text-detection-ctpn/checkpoints/
+
+ref_code/text-detection-ctpn/data/
+
+ref_code/CHINESE-OCR/test/
