@@ -7,14 +7,14 @@ NCLASSES: 2
 USE_GPU_NMS: True
 TRAIN:
   restore: 0
-  max_steps: 50000    # original: 50000
+  max_steps: 70000    # original: 50000
   SOLVER: Adam
   OHEM: False
   RPN_BATCHSIZE: 300
   BATCH_SIZE: 300
   LOG_IMAGE_ITERS: 100
   DISPLAY: 10
-  SNAPSHOT_ITERS: 1000
+  SNAPSHOT_ITERS: 5000
   HAS_RPN: True
   LEARNING_RATE: 0.00001
   MOMENTUM: 0.9

@@ -64,6 +64,10 @@ def ctpn(sess, net, image_name):
 
 
 if __name__ == '__main__':
+    # test sample name
+    # test_sample_loc = 'test_small'
+    test_sample_loc = 'demo'
+
     if os.path.exists("../data/results/"):
         shutil.rmtree("../data/results/")
     os.makedirs("../data/results/")
@@ -91,8 +95,6 @@ if __name__ == '__main__':
     for i in range(2):
         _, _ = test_ctpn(sess, net, im)
 
-    # test sample name
-    test_sample_loc = 'demo'
     im_names = glob.glob(os.path.join(cfg.DATA_DIR, test_sample_loc, '*.png')) + \
                glob.glob(os.path.join(cfg.DATA_DIR, test_sample_loc, '*.jpg'))
 

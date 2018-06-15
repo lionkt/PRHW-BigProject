@@ -1,6 +1,10 @@
 import pprint
 import sys
+import os
 import os.path
+
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+
 
 sys.path.append(os.getcwd())
 this_dir = os.path.dirname(__file__)
@@ -23,9 +27,6 @@ if __name__ == '__main__':
     log_dir = get_log_dir(imdb)
     print('Output will be saved to `{:s}`'.format(output_dir))
     print('Logs will be saved to `{:s}`'.format(log_dir))
-
-    device_name = '/gpu:0'
-    print(device_name)
 
     network = get_network('VGGnet_train')
 
