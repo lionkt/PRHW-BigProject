@@ -92,9 +92,9 @@ if __name__ == '__main__':
         _, _ = test_ctpn(sess, net, im)
 
     # test sample name
-    test_sample_loc = 'test_small'
-    im_names = glob.glob(os.path.join(cfg.DATA_DIR, 'test_small', '*.png')) + \
-               glob.glob(os.path.join(cfg.DATA_DIR, 'test_small', '*.jpg'))
+    test_sample_loc = 'demo'
+    im_names = glob.glob(os.path.join(cfg.DATA_DIR, test_sample_loc, '*.png')) + \
+               glob.glob(os.path.join(cfg.DATA_DIR, test_sample_loc, '*.jpg'))
 
     for im_name in im_names:
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')

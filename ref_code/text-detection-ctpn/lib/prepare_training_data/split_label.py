@@ -17,21 +17,19 @@ def draw_boxes(img,image_name,boxes):
         cv2.circle(img,(int(box[0]), int(box[1])),radius=10,color=(0,0,255))    # r 画出来(xmin, ymin)
         cv2.circle(img,(int(box[6]), int(box[7])),radius=10,color=(0,255,0))    # g 画出来(xmax, ymax)
 
-
     # cv2.imwrite(image_name, img)
 
 
 
 if __name__ == '__main__':
-    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_small/' + 'image'
-    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_small/' + 'label'
+    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'image'
+    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'split_label'
     out_path = 're_image'
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     files = os.listdir(path)
-
-    # files.sort()
-    files=files[0:10]   # 先测试小批数据
+    files.sort()
+    # files=files[0:10]   # 先测试小批数据
 
     for file in files:
         _, basename = os.path.split(file)
@@ -54,8 +52,13 @@ if __name__ == '__main__':
 
         boxes = []
 
-        with open(gt_file, 'r') as f:
-            lines = f.readlines()
+        try:
+            f = open(gt_file, 'r')
+        except:
+            continue    # 没找到的话，就跳过这个图片的gt
+        else:
+            lines = f.readlines()   # 找到的话，就读取
+
         for line in lines:
             # splitted_line = line.strip().lower().split(',')
             # pt_x = np.zeros((4, 1))
