@@ -102,7 +102,7 @@ def Texts_2_Boxes(file_content, format):
 def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_dir_name):
     iou_list = []
     iou_file = open(output_dir_name + 'map_iou.txt', 'w')  # 用来记录整张图的iou的文件
-    gt_file_names = os.listdir(os.path.join(cfg.DATA_DIR, test_sample_split_label_loc))
+    gt_file_names = os.listdir(os.path.join(test_sample_split_label_loc))
     gt_file_names.sort()
     predict_file_names = os.listdir(os.path.join(output_dir_name, 'split_label/'))
     predict_file_names.sort()
@@ -116,13 +116,13 @@ def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_di
             print('prediction Missing: ' + predict_file_name)
             continue
         # check the existance of
-        gt_img_name = os.path.join(cfg.DATA_DIR, test_sample_img_loc, stem + '.jpg')
+        gt_img_name = os.path.join(test_sample_img_loc, stem + '.jpg')
         if not os.path.exists(gt_img_name):
             print('image Missing: ' + gt_img_name)
             continue
 
         # read gt file
-        gt_file = open(os.path.join(cfg.DATA_DIR, test_sample_split_label_loc, basename), 'r')
+        gt_file = open(os.path.join(test_sample_split_label_loc, basename), 'r')
         gt_content = gt_file.readlines()
         gt_file.close()
         # read prediction file
@@ -140,6 +140,30 @@ def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_di
 
     iou_file.close()
     return iou_list
+
+
+
+def output_settings(begin_time_tag, path_list):
+    begin_time_tag = begin_time_tag
+    test_sample_loc = path_list[0]
+    test_sample_img_loc = path_list[1]
+    test_sample_split_label_loc = path_list[2]
+    output_dir_name = path_list[3]
+    output_boxed_image_loc = path_list[4]
+    output_split_label_loc = path_list[5]
+
+    f = open(output_dir_name + 'path_settings.txt', 'w')
+    f.write('begin_time_tag = ' + begin_time_tag + '\n')
+    f.write('test_sample_loc = ' + test_sample_loc + '\n')
+    f.write('---> test_sample_img_loc = ' + test_sample_img_loc + '\n')
+    f.write('---> test_sample_split_label_loc = ' + test_sample_split_label_loc + '\n')
+    f.write('output_dir_name = ' + output_dir_name + '\n')
+    f.write('---> output_boxed_image_loc = ' + output_boxed_image_loc + '\n')
+    f.write('---> output_split_label_loc = ' + output_split_label_loc + '\n')
+    f.close()
+
+    # 复制训练时的yml文件
+    # shutil.copyfile('text.yml', output_dir_name)
 
 
 def resize_im(im, scale, max_scale=None):
@@ -193,27 +217,34 @@ def ctpn(sess, net, image_name, output_dir_name):
     timer.toc()
     print(('Detection took {:.3f}s for '
            '{:d} object proposals').format(timer.total_time, boxes.shape[0]))
+    return timer.total_time
 
 
 
 if __name__ == '__main__':
     ######## test sample name ########
-    # test_sample_loc = 'test_small/'
-    # test_sample_loc = 'demo/'
+    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/test_small/'
+    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/demo/'
+    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/'
+    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/'
 
-    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/'
 
     test_sample_img_loc = test_sample_loc + 'image/'
     test_sample_split_label_loc = test_sample_loc +'split_label/'
 
-    output_time_tag = time.strftime('%m-%d_%H:%M:%S', time.localtime(time.time()))
-    output_dir_name = '../data/results' + output_time_tag + '/'
+    begin_time_tag = time.strftime('%m-%d_%H:%M:%S', time.localtime(time.time()))
+    output_dir_name = '../data/results/'
     if os.path.exists(output_dir_name):
         shutil.rmtree(output_dir_name)
     os.makedirs(output_dir_name)
-    os.makedirs(output_dir_name + "boxed_image")
-    os.makedirs(output_dir_name + "split_label")
+    os.makedirs(output_dir_name + "boxed_image/")
+    os.makedirs(output_dir_name + "split_label/")
 
+    ######## 输出实验的配置 #######
+    output_settings(begin_time_tag, [test_sample_loc, test_sample_img_loc, test_sample_split_label_loc, output_dir_name,
+                     output_dir_name + "boxed_image/", output_dir_name + "split_label/"])
+
+    ######## 开始实验 #######
     # read config file
     cfg_from_file('text.yml')
 
@@ -238,14 +269,24 @@ if __name__ == '__main__':
     for i in range(2):
         _, _ = test_ctpn(sess, net, im)
 
-    im_names = glob.glob(os.path.join(cfg.DATA_DIR, test_sample_img_loc, '*.png')) + \
-               glob.glob(os.path.join(cfg.DATA_DIR, test_sample_img_loc, '*.jpg'))
+    im_names = glob.glob(os.path.join(test_sample_img_loc, '*.png')) + \
+               glob.glob(os.path.join(test_sample_img_loc, '*.jpg'))
 
     # begin text detection
+    time_list = []
     for im_name in im_names:
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print(('Demo for {:s}'.format(im_name)))
-        ctpn(sess, net, im_name, output_dir_name=output_dir_name)
+        single_time = ctpn(sess, net, im_name, output_dir_name=output_dir_name)
+        time_list.append(single_time)
+
+
+    # output calcualtion time
+    time_file = open(output_dir_name + 'calculation_time.txt', 'w')
+    for i in range(len(time_list)):
+        time_file.write("%.4f" % time_list[i] + ' s' + '\n')
+    time_file.close()
+
 
     # calculate IOU-map
     print('====================== calculate IOU of each image ====================')
