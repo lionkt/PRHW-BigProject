@@ -4,6 +4,8 @@ import numpy as np
 import os, sys, cv2
 import glob
 import shutil
+import time
+import matplotlib.pyplot as plt
 
 
 sys.path.append(os.getcwd())
@@ -62,9 +64,15 @@ def IOU_mapBoexs(img, gt_boxes, predict_boxes):
         predict_map[predict_box[0]:predict_box[2] + 1, predict_box[1]:predict_box[3] + 1] = True
     I_val = np.sum(np.sum(np.logical_and(gt_map, predict_map), axis=0))
     U_val = np.sum(np.sum(np.logical_or(gt_map, predict_map), axis=0))
+
+    if U_val <= 1e-16:
+        print('IOU_mapBoexs 计算出现错误:被除数==0')
+        return -1.0
+
     iou = I_val/U_val
     if iou > 1.0:
-        print('IOU_mapBoexs 计算出现错误')
+        print('IOU_mapBoexs 计算出现错误:iou>1.0')
+        return -1.0
     return iou
 
 
@@ -89,6 +97,49 @@ def Texts_2_Boxes(file_content, format):
     boxes = np.array(boxes)
     return boxes
 
+
+
+def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_dir_name):
+    iou_list = []
+    iou_file = open(output_dir_name + 'map_iou.txt', 'w')  # 用来记录整张图的iou的文件
+    gt_file_names = os.listdir(os.path.join(cfg.DATA_DIR, test_sample_split_label_loc))
+    gt_file_names.sort()
+    predict_file_names = os.listdir(os.path.join(output_dir_name, 'split_label/'))
+    predict_file_names.sort()
+    for gt_file_name in gt_file_names:
+        _, basename = os.path.split(gt_file_name)
+        stem, ext = os.path.splitext(basename)
+        stem = stem.split('_')[-1]  # 获取image的真实名称
+        predict_file_name = 'res_' + stem + '.txt'
+        # chech the existance of predict_file_name
+        if predict_file_name not in predict_file_names:
+            print('prediction Missing: ' + predict_file_name)
+            continue
+        # check the existance of
+        gt_img_name = os.path.join(cfg.DATA_DIR, test_sample_img_loc, stem + '.jpg')
+        if not os.path.exists(gt_img_name):
+            print('image Missing: ' + gt_img_name)
+            continue
+
+        # read gt file
+        gt_file = open(os.path.join(cfg.DATA_DIR, test_sample_split_label_loc, basename), 'r')
+        gt_content = gt_file.readlines()
+        gt_file.close()
+        # read prediction file
+        predict_file = open(os.path.join(output_dir_name, 'split_label/', predict_file_name), 'r')
+        predict_content = predict_file.readlines()
+        predict_file.close()
+        # read image
+        img = cv2.imread(gt_img_name)
+        gt_boxes = Texts_2_Boxes(gt_content, 'HW_label')
+        predict_boxes = Texts_2_Boxes(predict_content, 'CTPN_result')
+        iou = IOU_mapBoexs(img, gt_boxes, predict_boxes)
+        iou_list.append(iou)
+        print('image ' + stem + '.jpg' + ' iou: %.4f' % iou)
+        iou_file.write(stem + '.jpg' + ' ' + '%.4f' % iou + '\n')
+
+    iou_file.close()
+    return iou_list
 
 
 def resize_im(im, scale, max_scale=None):
@@ -146,15 +197,17 @@ def ctpn(sess, net, image_name, output_dir_name):
 
 
 if __name__ == '__main__':
-    # test sample name
-    test_sample_loc = 'test_small/'
+    ######## test sample name ########
+    # test_sample_loc = 'test_small/'
     # test_sample_loc = 'demo/'
+
+    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/'
 
     test_sample_img_loc = test_sample_loc + 'image/'
     test_sample_split_label_loc = test_sample_loc +'split_label/'
 
-
-    output_dir_name = '../data/results/'
+    output_time_tag = time.strftime('%m-%d_%H:%M:%S', time.localtime(time.time()))
+    output_dir_name = '../data/results' + output_time_tag + '/'
     if os.path.exists(output_dir_name):
         shutil.rmtree(output_dir_name)
     os.makedirs(output_dir_name)
@@ -196,36 +249,11 @@ if __name__ == '__main__':
 
     # calculate IOU-map
     print('====================== calculate IOU of each image ====================')
-    gt_file_names = os.listdir(os.path.join(cfg.DATA_DIR, test_sample_split_label_loc))
-    gt_file_names.sort()
-    predict_file_names = os.listdir(os.path.join(output_dir_name , 'split_label/'))
-    predict_file_names.sort()
-    for gt_file_name in gt_file_names:
-        _, basename = os.path.split(gt_file_name)
-        stem, ext = os.path.splitext(basename)
-        stem = stem.split('_')[-1]  # 获取image的真实名称
-        predict_file_name = 'res_' + stem + '.txt'
-        # chech the existance of predict_file_name
-        if predict_file_name not in predict_file_names:
-            print('prediction Missing: ' + predict_file_name)
-            continue
-        # check the existance of
-        gt_img_name = os.path.join(cfg.DATA_DIR, test_sample_img_loc, stem + '.jpg')
-        if not os.path.exists(gt_img_name):
-            print('image Missing: ' + gt_img_name)
-            continue
-
-        # read gt file
-        gt_file =  open(os.path.join(cfg.DATA_DIR, test_sample_split_label_loc, basename), 'r')
-        gt_content = gt_file.readlines()
-        gt_file.close()
-        # read prediction file
-        predict_file = open(os.path.join(output_dir_name , 'split_label/',predict_file_name),'r')
-        predict_content = predict_file.readlines()
-        predict_file.close()
-        # read image
-        img = cv2.imread(gt_img_name)
-        gt_boxes = Texts_2_Boxes(gt_content, 'HW_label')
-        predict_boxes = Texts_2_Boxes(predict_content, 'CTPN_result')
-        iou = IOU_mapBoexs(img, gt_boxes, predict_boxes)
-        print('image ' + stem + '.jpg' + ' iou: %.4f' % iou)
+    IOU_list = calculate_IOU(cfg, test_sample_img_loc, test_sample_split_label_loc, output_dir_name)
+    # draw iou result
+    mean_iou_list = np.mean(IOU_list) * np.ones(np.shape(IOU_list))
+    plt.figure()
+    plt.plot(IOU_list, linewidth=2)
+    plt.plot(mean_iou_list, linewidth=2)
+    plt.title(test_sample_loc + ' iou_curve')
+    plt.savefig(output_dir_name + 'iou_curve.jpg', dpi=300)
