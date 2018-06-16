@@ -55,7 +55,7 @@ if __name__ == '__main__':
         try:
             f = open(gt_file, 'r')
         except:
-            continue    # 没找到的话，就跳过这个图片的gt
+            continue    # 没找到gt_file的话，就跳过这个图片的gt
         else:
             lines = f.readlines()   # 找到的话，就读取
 
