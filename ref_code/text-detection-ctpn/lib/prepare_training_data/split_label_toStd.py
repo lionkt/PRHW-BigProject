@@ -121,44 +121,27 @@ if __name__ == '__main__':
             width = xmax - xmin
             height = ymax - ymin
 
+            # add min-length detection,借鉴了模式识别课
+            if width <= 5 or height <=5:
+                continue
+
             box = [xmin, ymin, xmax, ymin, xmin, ymax, xmax, ymax]
             boxes.append(box)
 
-            # reimplement
-            step = 16.0
-            x_left = []
-            x_right = []
-            x_left.append(xmin)
-            x_left_start = int(math.ceil(xmin / 16.0) * 16.0)
-            if x_left_start == xmin:
-                x_left_start = xmin + 16
-            for i in np.arange(x_left_start, xmax, 16):
-                x_left.append(i)
-            x_left = np.array(x_left)
-
-            x_right.append(x_left_start - 1)
-            for i in range(1, len(x_left) - 1):
-                x_right.append(x_left[i] + 15)
-            x_right.append(xmax)
-            x_right = np.array(x_right)
-
-            idx = np.where(x_left == x_right)
-            x_left = np.delete(x_left, idx, axis=0)
-            x_right = np.delete(x_right, idx, axis=0)
+            # 直接输出
 
             if not os.path.exists('label_tmp'):
                 os.makedirs('label_tmp')
             with open(os.path.join('label_tmp', stem) + '.txt', 'a') as f:
-                for i in range(len(x_left)):
-                    f.writelines("text\t")
-                    f.writelines(str(int(x_left[i])))
-                    f.writelines("\t")
-                    f.writelines(str(int(ymin)))
-                    f.writelines("\t")
-                    f.writelines(str(int(x_right[i])))
-                    f.writelines("\t")
-                    f.writelines(str(int(ymax)))
-                    f.writelines("\n")
+                f.writelines("text\t")
+                f.writelines(str(int(xmin)))
+                f.writelines("\t")
+                f.writelines(str(int(ymin)))
+                f.writelines("\t")
+                f.writelines(str(int(xmax)))
+                f.writelines("\t")
+                f.writelines(str(int(ymax)))
+                f.writelines("\n")
 
 
         ####  save resize picture
