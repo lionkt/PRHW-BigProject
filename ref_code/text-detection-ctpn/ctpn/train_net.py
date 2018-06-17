@@ -3,7 +3,7 @@ import sys
 import os
 import os.path
 
-os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
 
 sys.path.append(os.getcwd())

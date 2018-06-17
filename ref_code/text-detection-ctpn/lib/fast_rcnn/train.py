@@ -124,7 +124,7 @@ class SolverWrapper(object):
                 raise 'Check your pretrained model {:s}'.format(self.pretrained_model)
 
         # prepare output-txt file
-        training_data_file = open(self.output_dir + 'training_data', 'w')
+        training_data_file = open(self.output_dir + 'training_data.txt', 'w')
         training_data_file.write('=====================================\n')
         training_data_file.write(
             'iter: %d / %d, total loss: %.4f, model loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, lr: %f, speed: {:.3f}s / iter' + '\n')

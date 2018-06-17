@@ -22,8 +22,8 @@ def draw_boxes(img,image_name,boxes):
 
 
 if __name__ == '__main__':
-    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'image'
-    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'split_label'
+    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/' + 'image'
+    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/' + 'split_label'
     out_path = 're_image'
     if not os.path.exists(out_path):
         os.makedirs(out_path)
@@ -60,42 +60,6 @@ if __name__ == '__main__':
             lines = f.readlines()   # 找到的话，就读取
 
         for line in lines:
-            # splitted_line = line.strip().lower().split(',')
-            # pt_x = np.zeros((4, 1))
-            # pt_y = np.zeros((4, 1))
-            # pt_x[0, 0] = int(float(splitted_line[0]) / img_size[1] * re_size[1])
-            # pt_y[0, 0] = int(float(splitted_line[1]) / img_size[0] * re_size[0])
-            # pt_x[1, 0] = int(float(splitted_line[2]) / img_size[1] * re_size[1])
-            # pt_y[1, 0] = int(float(splitted_line[3]) / img_size[0] * re_size[0])
-            # pt_x[2, 0] = int(float(splitted_line[4]) / img_size[1] * re_size[1])
-            # pt_y[2, 0] = int(float(splitted_line[5]) / img_size[0] * re_size[0])
-            # pt_x[3, 0] = int(float(splitted_line[6]) / img_size[1] * re_size[1])
-            # pt_y[3, 0] = int(float(splitted_line[7]) / img_size[0] * re_size[0])
-            #
-            # ind_x = np.argsort(pt_x, axis=0)
-            # pt_x = pt_x[ind_x]
-            # pt_y = pt_y[ind_x]
-            #
-            # if pt_y[0] < pt_y[1]:
-            #     pt1 = (pt_x[0], pt_y[0])
-            #     pt3 = (pt_x[1], pt_y[1])
-            # else:
-            #     pt1 = (pt_x[1], pt_y[1])
-            #     pt3 = (pt_x[0], pt_y[0])
-            #
-            # if pt_y[2] < pt_y[3]:
-            #     pt2 = (pt_x[2], pt_y[2])
-            #     pt4 = (pt_x[3], pt_y[3])
-            # else:
-            #     pt2 = (pt_x[3], pt_y[3])
-            #     pt4 = (pt_x[2], pt_y[2])
-            #
-            # xmin = int(min(pt1[0], pt2[0]))
-            # ymin = int(min(pt1[1], pt2[1]))
-            # xmax = int(max(pt2[0], pt4[0]))
-            # ymax = int(max(pt3[1], pt4[1]))
-
-
             # 替换为助教给出的min 和 max，并进行缩放
             splitted_line = line.strip().lower().split(' ')
             xmin_original = float(splitted_line[2])

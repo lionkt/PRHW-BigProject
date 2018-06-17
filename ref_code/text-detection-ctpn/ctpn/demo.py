@@ -7,6 +7,8 @@ import shutil
 import time
 import matplotlib.pyplot as plt
 
+from evaluate_lib import evaluate_predictions
+
 
 sys.path.append(os.getcwd())
 from lib.networks.factory import get_network
@@ -15,6 +17,8 @@ from lib.fast_rcnn.test import test_ctpn
 from lib.utils.timer import Timer
 from lib.text_connector.detectors import TextDetector
 from lib.text_connector.text_connect_cfg import Config as TextLineCfg
+
+
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
@@ -102,12 +106,14 @@ def Texts_2_Boxes(file_content, format):
 
 
 def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_dir_name):
+    predict_boxes_total = []
     iou_list = []
     iou_file = open(output_dir_name + 'map_iou.txt', 'w')  # 用来记录整张图的iou的文件
     gt_file_names = os.listdir(os.path.join(test_sample_split_label_loc))
     gt_file_names.sort()
     predict_file_names = os.listdir(os.path.join(output_dir_name, 'split_label/'))
     predict_file_names.sort()
+    img_ix = 0
     for gt_file_name in gt_file_names:
         _, basename = os.path.split(gt_file_name)
         stem, ext = os.path.splitext(basename)
@@ -140,8 +146,15 @@ def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_di
         print('image ' + stem + '.jpg' + ' iou: %.4f' % iou)
         iou_file.write(stem + '.jpg' + ' ' + '%.4f' % iou + '\n')
 
+        predict_boxes = np.hstack((predict_boxes, img_ix * np.ones((len(predict_boxes), 1))))
+        if len(predict_boxes_total) == 0:
+            predict_boxes_total = predict_boxes
+        else:
+            predict_boxes_total = np.vstack((predict_boxes_total, predict_boxes))
+
+        img_ix += 1
     iou_file.close()
-    return iou_list
+    return iou_list, predict_boxes_total
 
 
 
@@ -249,6 +262,7 @@ if __name__ == '__main__':
 
     begin_time_tag = time.strftime('%m-%d_%H:%M:%S', time.localtime(time.time()))
     output_dir_name = '../data/results/'
+
     if os.path.exists(output_dir_name):
         shutil.rmtree(output_dir_name)
     os.makedirs(output_dir_name)
@@ -271,7 +285,6 @@ if __name__ == '__main__':
     # load model
     print(('Loading network {:s}... '.format("VGGnet_test")), end=' ')
     saver = tf.train.Saver()
-
     try:
         ckpt = tf.train.get_checkpoint_state(cfg.TEST.checkpoints_path)
         print('Restoring from {}...'.format(ckpt.model_checkpoint_path), end=' ')
@@ -305,9 +318,15 @@ if __name__ == '__main__':
 
     # calculate IOU-map
     print('====================== calculate IOU of each image ====================')
-    IOU_list = calculate_IOU(cfg, test_sample_img_loc, test_sample_split_label_loc, output_dir_name)
+    IOU_list, predict_boxes_total = calculate_IOU(cfg, test_sample_img_loc, test_sample_split_label_loc, output_dir_name)
     # draw iou result
     mean_iou_list = np.mean(IOU_list) * np.ones(np.shape(IOU_list))
+
+    gt_file_names = os.listdir(os.path.join(test_sample_split_label_loc))
+    gt_file_names.sort()
+    mAP = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.5)
+    print(' -------------------- map : %.4f' % mAP)
+
     plt.figure()
     plt.plot(IOU_list, linewidth=2)
     plt.plot(mean_iou_list, linewidth=2)

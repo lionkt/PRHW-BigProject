@@ -39,9 +39,15 @@ class VGGnet_test(Network):
 
         (self.feed('conv5_3').conv(3, 3, 512, 1, 1, name='rpn_conv/3x3'))
 
-        (self.feed('rpn_conv/3x3').Bilstm(512, 128, 512, name='lstm_o'))
-        (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
-        (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
+        #### with bi-direction lstm
+        # (self.feed('rpn_conv/3x3').Bilstm(512, 128, 512, name='lstm_o'))
+        # (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
+        # (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
+
+        #### without lstm
+        (self.feed('rpn_conv/3x3').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
+        (self.feed('rpn_conv/3x3').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
+
 
         #  shape is (1, H, W, Ax2) -> (1, H, WxA, 2)
         (self.feed('rpn_cls_score')
@@ -54,3 +60,4 @@ class VGGnet_test(Network):
 
         (self.feed('rpn_cls_prob_reshape', 'rpn_bbox_pred', 'im_info')
          .proposal_layer(_feat_stride, anchor_scales, 'TEST', name='rois'))
+456852
