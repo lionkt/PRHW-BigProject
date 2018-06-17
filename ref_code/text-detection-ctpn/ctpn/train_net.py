@@ -36,3 +36,8 @@ if __name__ == '__main__':
               pretrained_model='../data/pretrain/VGG_imagenet.npy',
               max_iters=int(cfg.TRAIN.max_steps),
               restore=bool(int(cfg.TRAIN.restore)))
+
+
+    # train_net(network, imdb, roidb, output_dir=output_dir, log_dir=log_dir,
+    #           pretrained_model=None, max_iters=int(cfg.TRAIN.max_steps),
+    #           restore=bool(int(cfg.TRAIN.restore)))

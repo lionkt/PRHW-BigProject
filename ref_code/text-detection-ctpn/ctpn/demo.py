@@ -16,6 +16,8 @@ from lib.utils.timer import Timer
 from lib.text_connector.detectors import TextDetector
 from lib.text_connector.text_connect_cfg import Config as TextLineCfg
 
+os.environ['CUDA_VISIBLE_DEVICES'] = "1"
+
 
 def IOU_2Box(gt_box, predict_box):
     """
