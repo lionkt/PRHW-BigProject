@@ -162,10 +162,23 @@ def output_settings(begin_time_tag, path_list):
     f.write('output_dir_name = ' + output_dir_name + '\n')
     f.write('---> output_boxed_image_loc = ' + output_boxed_image_loc + '\n')
     f.write('---> output_split_label_loc = ' + output_split_label_loc + '\n')
+    # output text_connect_cfg
+    f.write('-----------------------------------------\n')
+    f.write('text_connect_cfg.SCALE:%d' % TextLineCfg.SCALE + '\n')
+    f.write('text_connect_cfg.MAX_SCALE:%d' % TextLineCfg.MAX_SCALE + '\n')
+    f.write('text_connect_cfg.TEXT_PROPOSALS_WIDTH:%d' % TextLineCfg.TEXT_PROPOSALS_WIDTH + '\n')
+    f.write('text_connect_cfg.MIN_NUM_PROPOSALS:%d' % TextLineCfg.MIN_NUM_PROPOSALS + '\n')
+    f.write('text_connect_cfg.MIN_RATIO:%.2f' % TextLineCfg.MIN_RATIO + '\n')
+    f.write('text_connect_cfg.LINE_MIN_SCORE:%.4f' % TextLineCfg.LINE_MIN_SCORE + '\n')
+    f.write('text_connect_cfg.MAX_HORIZONTAL_GAP:%d' % TextLineCfg.MAX_HORIZONTAL_GAP + '\n')
+    f.write('text_connect_cfg.TEXT_PROPOSALS_MIN_SCORE:%.4f' % TextLineCfg.TEXT_PROPOSALS_MIN_SCORE + '\n')
+    f.write('text_connect_cfg.TEXT_PROPOSALS_NMS_THRESH:%.4f' % TextLineCfg.TEXT_PROPOSALS_NMS_THRESH + '\n')
+    f.write('text_connect_cfg.MIN_V_OVERLAPS:%.4f' % TextLineCfg.MIN_V_OVERLAPS + '\n')
+    f.write('text_connect_cfg.MIN_SIZE_SIM:%.4f' % TextLineCfg.MIN_SIZE_SIM + '\n')
     f.close()
 
     # 复制训练时的yml文件
-    # shutil.copyfile('text.yml', output_dir_name)
+    shutil.copyfile('text.yml', output_dir_name + 'text.yml')
 
 
 def resize_im(im, scale, max_scale=None):

@@ -123,6 +123,14 @@ class SolverWrapper(object):
             except:
                 raise 'Check your pretrained model {:s}'.format(self.pretrained_model)
 
+        # prepare output-txt file
+        training_data_file = open(self.output_dir + 'training_data', 'w')
+        training_data_file.write('=====================================\n')
+        training_data_file.write(
+            'iter: %d / %d, total loss: %.4f, model loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, lr: %f, speed: {:.3f}s / iter' + '\n')
+        training_data_file.write('max iter:%d' % max_iters + '\n')
+        training_data_file.write('=====================================\n')
+
         # resuming a trainer
         if restore:
             try:
@@ -182,12 +190,17 @@ class SolverWrapper(object):
                         (iter, max_iters, total_loss_val,model_loss_val,rpn_loss_cls_val,rpn_loss_box_val,lr.eval()))
                 print('speed: {:.3f}s / iter'.format(_diff_time))
 
+                training_data_file.write('%d'%iter +' %.4f'%total_loss_val + ' %.4f'%model_loss_val + ' %.4f'%rpn_loss_cls_val + \
+                                         ' %.4f'%rpn_loss_box_val + ' %f'%lr.eval() + ' %.3f'%_diff_time + '\n')
+
             if (iter+1) % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = iter
                 self.snapshot(sess, iter)
 
         if last_snapshot_iter != iter:
             self.snapshot(sess, iter)
+            training_data_file.close()
+
 
 def get_training_roidb(imdb):
     """Returns a roidb (Region of Interest database) for use in training."""
