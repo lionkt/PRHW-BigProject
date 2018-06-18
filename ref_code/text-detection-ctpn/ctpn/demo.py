@@ -146,6 +146,9 @@ def calculate_IOU(cfg, test_sample_img_loc,test_sample_split_label_loc,output_di
         print('image ' + stem + '.jpg' + ' iou: %.4f' % iou)
         iou_file.write(stem + '.jpg' + ' ' + '%.4f' % iou + '\n')
 
+        if len(predict_boxes) == 0:
+            predict_boxes = np.zeros((1, 4))
+
         predict_boxes = np.hstack((predict_boxes, img_ix * np.ones((len(predict_boxes), 1))))
         if len(predict_boxes_total) == 0:
             predict_boxes_total = predict_boxes
@@ -290,6 +293,7 @@ if __name__ == '__main__':
         print('Restoring from {}...'.format(ckpt.model_checkpoint_path), end=' ')
         saver.restore(sess, ckpt.model_checkpoint_path)
         print('done')
+        ckpt = tf.train.get_checkpoint_state(cfg.TEST.checkpoints_path)
     except:
         raise 'Check your pretrained {:s}'.format(ckpt.model_checkpoint_path)
 
@@ -322,10 +326,19 @@ if __name__ == '__main__':
     # draw iou result
     mean_iou_list = np.mean(IOU_list) * np.ones(np.shape(IOU_list))
 
+    map_file = open(output_dir_name + 'mAP.txt', 'w')
     gt_file_names = os.listdir(os.path.join(test_sample_split_label_loc))
     gt_file_names.sort()
-    mAP = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.5)
-    print(' -------------------- map : %.4f' % mAP)
+    mAP_03 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.3)
+    mAP_04 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.4)
+    mAP_05 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.5)
+
+    print(' -------------------- mAP(0.3) : %.4f' % mAP_03 + ' mAP(0.4) : %.4f' % mAP_04 + ' mAP(0.5) : %.4f' % mAP_05)
+    map_file.write('map(iou=0.3)  %.4f' % mAP_03 + '\n')
+    map_file.write('map(iou=0.4)  %.4f' % mAP_04 + '\n')
+    map_file.write('map(iou=0.5)  %.4f' % mAP_05 + '\n')
+    map_file.close()
+
 
     plt.figure()
     plt.plot(IOU_list, linewidth=2)
