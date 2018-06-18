@@ -80,13 +80,13 @@ if __name__ == '__main__':
             if class_flag[2] > 0:
                 class_inx += 5
 
-            if class_inx == 1:  real_class = 0      # 数字
-            elif class_inx==3:  real_class = 1      # 英文
-            elif class_inx==5:  real_class = 2      # 汉字
-            elif class_inx==4:  real_class = 3      # 数字+英文
-            elif class_inx==6:  real_class = 4      # 数字+汉字
-            elif class_inx==8:  real_class = 5      # 英文+汉字
-            elif class_inx==9:  real_class = 6      # 数字+英文+汉字
+            if class_inx == 1:  real_class = 1      # 数字
+            elif class_inx==3:  real_class = 2      # 英文
+            elif class_inx==5:  real_class = 3      # 汉字
+            elif class_inx==4:  real_class = 4      # 数字+英文
+            elif class_inx==6:  real_class = 5      # 数字+汉字
+            elif class_inx==8:  real_class = 6      # 英文+汉字
+            elif class_inx==9:  real_class = 7      # 数字+英文+汉字
             else:
                 print('=============== 类别数据读取有误 =============== ')
 
@@ -122,7 +122,17 @@ if __name__ == '__main__':
             if not os.path.exists('with_class_label'):
                 os.makedirs('with_class_label')
             with open(os.path.join('with_class_label', stem) + '.txt', 'a') as f:
-                # f.writelines("text\t")
+                text_label = ''
+                if class_inx == 1:  real_class = 'text_1'      # 数字
+                elif class_inx==3:  real_class = 'text_2'      # 英文
+                elif class_inx==5:  real_class = 'text_3'      # 汉字
+                elif class_inx==4:  real_class = 'text_4'      # 数字+英文
+                elif class_inx==6:  real_class = 'text_5'      # 数字+汉字
+                elif class_inx==8:  real_class = 'text_6'      # 英文+汉字
+                elif class_inx==9:  real_class = 'text_7'      # 数字+英文+汉字
+                else:
+                    print('=============== 类别数据读取有误 =============== ')
+                f.writelines(real_class + "\t")
                 f.writelines(str(int(xmin)))
                 f.writelines("\t")
                 f.writelines(str(int(ymin)))
@@ -130,8 +140,6 @@ if __name__ == '__main__':
                 f.writelines(str(int(xmax)))
                 f.writelines("\t")
                 f.writelines(str(int(ymax)))
-                f.writelines("\t")
-                f.writelines(str(int(real_class)))
                 f.writelines("\n")
 
 

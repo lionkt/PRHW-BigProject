@@ -22,8 +22,8 @@ def draw_boxes(img,image_name,boxes):
 
 
 if __name__ == '__main__':
-    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'image'
-    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'split_label'
+    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/' + 'image'
+    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/' + 'split_label'
     out_path = 're_image'
     if not os.path.exists(out_path):
         os.makedirs(out_path)
@@ -129,20 +129,20 @@ if __name__ == '__main__':
             boxes.append(box)
 
             # reimplement
-            step = 16.0
+            step = 10.0 #16.0
             x_left = []
             x_right = []
             x_left.append(xmin)
-            x_left_start = int(math.ceil(xmin / 16.0) * 16.0)
+            x_left_start = int(math.ceil(xmin / step) * step)
             if x_left_start == xmin:
-                x_left_start = xmin + 16
-            for i in np.arange(x_left_start, xmax, 16):
+                x_left_start = xmin + step
+            for i in np.arange(x_left_start, xmax, step):
                 x_left.append(i)
             x_left = np.array(x_left)
 
             x_right.append(x_left_start - 1)
             for i in range(1, len(x_left) - 1):
-                x_right.append(x_left[i] + 15)
+                x_right.append(x_left[i] + step - 1)
             x_right.append(xmax)
             x_right = np.array(x_right)
 
