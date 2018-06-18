@@ -20,7 +20,7 @@ from lib.text_connector.text_connect_cfg import Config as TextLineCfg
 
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = "1"
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 def IOU_2Box(gt_box, predict_box):
@@ -255,13 +255,18 @@ def ctpn(sess, net, image_name, output_dir_name):
 if __name__ == '__main__':
     ######## test sample name ########
     # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/test_small/'
-    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/demo/'
+    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/demo/'
     # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/'
-    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/'
+    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/'
 
+    calculate_IOU_mAP_falg = True
 
     test_sample_img_loc = test_sample_loc + 'image/'
-    test_sample_split_label_loc = test_sample_loc +'split_label/'
+    test_sample_split_label_loc = test_sample_loc + 'split_label/'
+
+    if not os.path.exists(test_sample_split_label_loc):
+        print('无split_label，无法验证iou和mAP，只能进行文本区域检测')
+        calculate_IOU_mAP_falg = False
 
     begin_time_tag = time.strftime('%m-%d_%H:%M:%S', time.localtime(time.time()))
     output_dir_name = '../data/results/'
@@ -321,27 +326,28 @@ if __name__ == '__main__':
 
 
     # calculate IOU-map
-    print('====================== calculate IOU of each image ====================')
-    IOU_list, predict_boxes_total = calculate_IOU(cfg, test_sample_img_loc, test_sample_split_label_loc, output_dir_name)
-    # draw iou result
-    mean_iou_list = np.mean(IOU_list) * np.ones(np.shape(IOU_list))
+    if calculate_IOU_mAP_falg == True:
+        print('====================== calculate IOU of each image ====================')
+        IOU_list, predict_boxes_total = calculate_IOU(cfg, test_sample_img_loc, test_sample_split_label_loc, output_dir_name)
+        # draw iou result
+        mean_iou_list = np.mean(IOU_list) * np.ones(np.shape(IOU_list))
 
-    map_file = open(output_dir_name + 'mAP.txt', 'w')
-    gt_file_names = os.listdir(os.path.join(test_sample_split_label_loc))
-    gt_file_names.sort()
-    mAP_03 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.3)
-    mAP_04 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.4)
-    mAP_05 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.5)
+        map_file = open(output_dir_name + 'mAP.txt', 'w')
+        gt_file_names = os.listdir(os.path.join(test_sample_split_label_loc))
+        gt_file_names.sort()
+        mAP_03 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.3)
+        mAP_04 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.4)
+        mAP_05 = evaluate_predictions(predict_boxes_total, test_sample_split_label_loc, gt_file_names, ovthresh=0.5)
 
-    print(' -------------------- mAP(0.3) : %.4f' % mAP_03 + ' mAP(0.4) : %.4f' % mAP_04 + ' mAP(0.5) : %.4f' % mAP_05)
-    map_file.write('map(iou=0.3)  %.4f' % mAP_03 + '\n')
-    map_file.write('map(iou=0.4)  %.4f' % mAP_04 + '\n')
-    map_file.write('map(iou=0.5)  %.4f' % mAP_05 + '\n')
-    map_file.close()
+        print(' -------------------- mAP(0.3) : %.4f' % mAP_03 + ' mAP(0.4) : %.4f' % mAP_04 + ' mAP(0.5) : %.4f' % mAP_05)
+        map_file.write('map(iou=0.3)  %.4f' % mAP_03 + '\n')
+        map_file.write('map(iou=0.4)  %.4f' % mAP_04 + '\n')
+        map_file.write('map(iou=0.5)  %.4f' % mAP_05 + '\n')
+        map_file.close()
 
 
-    plt.figure()
-    plt.plot(IOU_list, linewidth=2)
-    plt.plot(mean_iou_list, linewidth=2)
-    plt.title(test_sample_loc + ' iou_curve')
-    plt.savefig(output_dir_name + 'iou_curve.jpg', dpi=300)
+        plt.figure()
+        plt.plot(IOU_list, linewidth=2)
+        plt.plot(mean_iou_list, linewidth=2)
+        plt.title(test_sample_loc + ' iou_curve')
+        plt.savefig(output_dir_name + 'iou_curve.jpg', dpi=300)

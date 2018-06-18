@@ -67,10 +67,26 @@ def copy_img_by_split_plabel(img_path, split_label_path, out_path):
 
 if __name__ == '__main__':
     img_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'image/'
-    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'label/'
+    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset/' + 'total_label/'
 
+    # 划分出训练集
     gt_file_name = 'train.txt'
     out_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/'
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    else:
+        shutil.rmtree(out_path)
+        os.makedirs(out_path)
+    print('start split label')
+    split_label_to_files(gt_path, gt_file_name, out_path + 'split_label/')
+    print('end split, start copy img to output folder')
+    copy_img_by_split_plabel(img_path, out_path + 'split_label/', out_path + 'image/')
+    print('Finish img-copy')
+
+
+    # 划分出测试集合
+    gt_file_name = 'valid.txt'
+    out_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/'
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     else:

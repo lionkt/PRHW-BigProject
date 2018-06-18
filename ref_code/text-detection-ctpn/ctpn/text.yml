@@ -7,7 +7,7 @@ NCLASSES: 2
 USE_GPU_NMS: True
 TRAIN:
   restore: 0
-  max_steps: 10000    # original: 50000
+  max_steps: 20000    # original: 50000
   SOLVER: Adam
   OHEM: False
   RPN_BATCHSIZE: 300
@@ -34,6 +34,7 @@ TRAIN:
 TEST:
   HAS_RPN: True
   DETECT_MODE: H
-  checkpoints_path: ../checkpoints/
 #  checkpoints_path: output/ctpn_end2end/voc_2007_trainval
+  checkpoints_path: ../checkpoints/
+#  checkpoints_path: ../checkpoints_official/
 

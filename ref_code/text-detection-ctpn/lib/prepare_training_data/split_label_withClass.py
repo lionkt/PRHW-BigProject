@@ -22,8 +22,8 @@ def draw_boxes(img,image_name,boxes):
 
 
 if __name__ == '__main__':
-    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/' + 'image'
-    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/' + 'split_label'
+    path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/' + 'image'
+    gt_path = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/' + 'split_label'
     out_path = 're_image'
     if not os.path.exists(out_path):
         os.makedirs(out_path)

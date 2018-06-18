@@ -129,7 +129,7 @@ if __name__ == '__main__':
             boxes.append(box)
 
             # reimplement
-            step = 10.0 #16.0
+            step = 16.0 #16.0
             x_left = []
             x_right = []
             x_left.append(xmin)
