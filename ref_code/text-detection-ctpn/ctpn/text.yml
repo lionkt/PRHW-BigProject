@@ -35,6 +35,7 @@ TEST:
   HAS_RPN: True
   DETECT_MODE: H
 #  checkpoints_path: output/ctpn_end2end/voc_2007_trainval
+#  checkpoints_path: ../checkpoints_compress/
   checkpoints_path: ../checkpoints/
 #  checkpoints_path: ../checkpoints_official/
 

@@ -26,27 +26,27 @@ class VGGnet_test(Network):
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool2')
              .conv(3, 3, 256, 1, 1, name='conv3_1')
              .conv(3, 3, 256, 1, 1, name='conv3_2')
-             # .conv(3, 3, 256, 1, 1, name='conv3_3')
+             .conv(3, 3, 256, 1, 1, name='conv3_3')   # compress版本中去掉了
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool3')
              .conv(3, 3, 512, 1, 1, name='conv4_1')
              .conv(3, 3, 512, 1, 1, name='conv4_2')
-             # .conv(3, 3, 512, 1, 1, name='conv4_3')
+             .conv(3, 3, 512, 1, 1, name='conv4_3')   # compress版本中去掉了
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool4')
              .conv(3, 3, 512, 1, 1, name='conv5_1')
-             # .conv(3, 3, 512, 1, 1, name='conv5_2')
+             .conv(3, 3, 512, 1, 1, name='conv5_2')   # compress版本中去掉了
              .conv(3, 3, 512, 1, 1, name='conv5_3')
          )
 
         (self.feed('conv5_3').conv(3, 3, 512, 1, 1, name='rpn_conv/3x3'))
 
         #### with bi-direction lstm
-        # (self.feed('rpn_conv/3x3').Bilstm(512, 128, 512, name='lstm_o'))
-        # (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
-        # (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
+        (self.feed('rpn_conv/3x3').Bilstm(512, 128, 512, name='lstm_o'))
+        (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
+        (self.feed('lstm_o').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
 
         #### without lstm
-        (self.feed('rpn_conv/3x3').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
-        (self.feed('rpn_conv/3x3').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
+        # (self.feed('rpn_conv/3x3').lstm_fc(512, len(anchor_scales) * 10 * 4, name='rpn_bbox_pred'))
+        # (self.feed('rpn_conv/3x3').lstm_fc(512, len(anchor_scales) * 10 * 2, name='rpn_cls_score'))
 
 
         #  shape is (1, H, W, Ax2) -> (1, H, WxA, 2)

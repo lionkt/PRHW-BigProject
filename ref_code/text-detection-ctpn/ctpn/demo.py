@@ -220,6 +220,11 @@ def draw_boxes(img, image_name, boxes, scale, output_dir_name):
             cv2.line(img, (int(box[6]), int(box[7])), (int(box[2]), int(box[3])), color, 2)
             cv2.line(img, (int(box[4]), int(box[5])), (int(box[6]), int(box[7])), color, 2)
 
+            # 输出score
+            font = cv2.FONT_HERSHEY_SIMPLEX  # 定义字体
+            # 图像，文字内容， 坐标 ，字体，大小，颜色，字体厚度
+            img = cv2.putText(img, '%.4f' % box[8], (int(box[4]), int(box[5])), font, 0.7, (0, 0, 255), 2)
+
             min_x = min(int(box[0]/scale),int(box[2]/scale),int(box[4]/scale),int(box[6]/scale))
             min_y = min(int(box[1]/scale),int(box[3]/scale),int(box[5]/scale),int(box[7]/scale))
             max_x = max(int(box[0]/scale),int(box[2]/scale),int(box[4]/scale),int(box[6]/scale))
@@ -255,7 +260,9 @@ def ctpn(sess, net, image_name, output_dir_name):
 if __name__ == '__main__':
     ######## test sample name ########
     # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/test_small/'
-    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/demo/'
+    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/demo/'
+    # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/NetCommander_sampleData/'
+    test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ref_code/text-detection-ctpn/data/NC_processedData/'
     # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_train/'
     # test_sample_loc = '/home/crown/WORK_space/PRHW-BigProject/ID_dataset_valid/'
 
